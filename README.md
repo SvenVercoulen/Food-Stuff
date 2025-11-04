@@ -6,10 +6,9 @@ An application that tracks the time since you last ate something, drank somethin
 Here are some ways I thought of to make use of AI regarding this idea:
 
 1. Smart Reminders & Predictions
-Instead of just reminding the user after a fixed time, an AI model could:
-Learn personal habits (e.g., you usually drink every 3 hours).
-Predict when the user is likely to forget to eat, drink, or go outside.
-Suggest reminders at the right time (not too early, not too late).
-
-Example: If the model sees you skipped meals yesterday at lunchtime, it might proactively nudge you earlier today.\
+-Instead of just reminding the user after a fixed time, an AI model could:
+ -Learn personal habits (e.g., you usually drink every 3 hours).
+ -Predict when the user is likely to forget to eat, drink, or go outside.
+ -Suggest reminders at the right time (not too early, not too late).
+-Example: If the model sees you skipped meals yesterday at lunchtime, it might proactively nudge you earlier today.\
 
