@@ -30,7 +30,7 @@ A conversational AI could:
 An AI system could analyze logs over time to provide personalized insights:
 - “You usually go outside more on weekends than weekdays.”
 - “You tend to drink less water on days you stay indoors.”
-- “You average 25 minutes outside per day; increasing it to 45 minutes could improve your mood and energy.”
+- “You average 25 minutes outside per day; increasing it to 45 minutes could improve your mood and energy.”  
 This can be rule-based at first, but AI can make correlations (e.g., weather vs. your outdoor time).  
 
 ---
