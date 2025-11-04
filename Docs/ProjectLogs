@@ -37,6 +37,6 @@ An AI system could analyze logs over time to provide personalized insights:
 
 After some work I have set up a small android application with a simple UI. <br> This UI consists of 3 simple buttons that can be pressed, one for eating, one for drinking and the last for going outside/back inside.
 
-![alt text](../Images/image.PNG)
+![alt text](https://raw.githubusercontent.com/SvenVercoulen/Food-Stuff/main/Docs/Images/image.PNG)
 ![Idea of Statistics page](../Images/image2.PNG)
 ![Current UI](../Images/image3.PNG)
