@@ -37,7 +37,7 @@ An AI system could analyze logs over time to provide personalized insights:
 
 After some work I have set up a small android application with a simple UI. <br> This UI consists of 3 simple buttons that can be pressed, one for eating, one for drinking and the last for going outside/back inside. ![Current UI](Images/image3.png) <br>
 
-I have also designed some new pages I want to add to my application which consist of the sSatistics and the EditData page. <br>
+I have also designed some new pages I want to add to my application which consist of the Satistics and the EditData page. <br>
 
 The EditData page should allow the user to add moments when they ate, drink or went outside at the end of the day incase they forgot:
 ![Idea of EditData page](Images/image.png)
@@ -52,3 +52,4 @@ The Statistics page should hold the general data of the user like the following:
 ![Idea of Statistics page](Images/image2.png)
 <br>
 
+Now I am working on getting the buttons to work. I need to find a way to save the time and date whenever a user presses one of the three buttons and send that data to a place where it can be stored and read by the AI.
