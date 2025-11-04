@@ -35,8 +35,20 @@ An AI system could analyze logs over time to provide personalized insights:
 
 ---
 
-After some work I have set up a small android application with a simple UI. <br> This UI consists of 3 simple buttons that can be pressed, one for eating, one for drinking and the last for going outside/back inside.
+After some work I have set up a small android application with a simple UI. <br> This UI consists of 3 simple buttons that can be pressed, one for eating, one for drinking and the last for going outside/back inside. ![Current UI](Images/image3.png) <br>
 
-![alt text](Images/image.png)
+I have also designed some new pages I want to add to my application which consist of the sSatistics and the EditData page. <br>
+
+The EditData page should allow the user to add moments when they ate, drink or went outside at the end of the day incase they forgot:
+![Idea of EditData page](Images/image.png)
+<br>
+
+The Statistics page should hold the general data of the user like the following:
+- When the last time was since the user ate/drank/went outside
+- How long the user has been outside today
+- How often a user has eaten/drank something today
+- etc.
+
 ![Idea of Statistics page](Images/image2.png)
-![Current UI](Images/image3.png)
+<br>
+
