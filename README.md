@@ -12,7 +12,7 @@ Instead of just reminding the user after a fixed time, an AI model could:
  - Learn personal habits (e.g., you usually drink every 3 hours).  
  - Predict when the user is likely to forget to eat, drink, or go outside.  
  - Suggest reminders at the right time (not too early, not too late).  
-Example: If the model sees you skipped meals yesterday at lunchtime, it might proactively nudge you earlier today.
+ - Example: If the model sees you skipped meals yesterday at lunchtime, it might proactively nudge you earlier today.
 
 ---
 
@@ -22,6 +22,18 @@ A conversational AI could:
 - Answer questions like:
   - “How long since I last drank water?”
   - “How much time have I spent outside this week?”
-- Offer encouragement or tips when it detects unhealthy patterns.\
+- Offer encouragement or tips when it detects unhealthy habits.
+
+---
+
+3. Pattern Recognition & Insights
+An AI system could analyze logs over time to provide personalized insights:
+- “You usually go outside more on weekends than weekdays.”
+- “You tend to drink less water on days you stay indoors.”
+- “You average 25 minutes outside per day; increasing it to 45 minutes could improve your mood and energy.”
+This can be rule-based at first, but AI can make correlations (e.g., weather vs. your outdoor time).  
+
+---
+
 
 
