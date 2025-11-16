@@ -62,3 +62,5 @@ user_id,activity,timestamp,hour,day_of_week,is_weekend,minutes_since_midnight,ti
 
 I have also made a simple python file which is used for training the AI model.
 
+The last week I have worked on making the "eat", "drink" and "go outside" buttons work. Now if the user clicks any of these buttons the date and time of the action is stored locally to the phone. This is helpful because it allows me to take that locally stored data, import it to my laptop and train my AI with it. This is done manually for now because this will be used to expand my dataset to train the initial AI. Later the AI will use this locally stored data to make predictions, give feedback, etc.
+
