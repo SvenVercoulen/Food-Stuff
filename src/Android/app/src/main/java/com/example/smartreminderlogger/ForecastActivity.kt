@@ -18,23 +18,44 @@ class ForecastActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forecast)
-
-        // Calculate features from UserData.csv
         val features = calculateFeatures()
 
         if (features != null) {
-            // Run Predictions
             val drinksTomorrow = runPrediction("drink_model.onnx", features)
             val mealsTomorrow = runPrediction("eat_model.onnx", features)
 
-            // Show Results
             findViewById<TextView>(R.id.tvDrinkPrediction).text =
                 "💧 Drink Goal: ${String.format("%.1f", drinksTomorrow)} times"
 
             findViewById<TextView>(R.id.tvEatPrediction).text =
                 "🍽️ Eat Goal: ${String.format("%.1f", mealsTomorrow)} times"
+
+            val drinksToday = features[2]
+            val drinkGoal = 15
+            val drinkRemaining = drinkGoal - drinksToday
+
+            val drinkProgressText = if (drinkGoal > drinksToday) {
+                "You've drank ${drinksToday.toInt()} times today.\nDrink ${String.format("%.1f", drinkRemaining)} more times to reach your goal!"
+            } else {
+                "You've drank ${drinksToday.toInt()} times today.\nGoal reached! Great job staying hydrated."
+            }
+
+            findViewById<TextView>(R.id.DrinkProgress).text = drinkProgressText
+
+            val eatToday = features[3]
+            val eatGoal = 4
+            val eatRemaining = eatGoal - eatToday
+
+            val progressText = if (eatGoal > eatToday) {
+                "You've ate ${eatToday.toInt()} times today.\nEat ${String.format("%.1f", eatRemaining)} more times to reach your goal!"
+            } else {
+                "You've ate ${eatToday.toInt()} times today.\nGoal reached! Great job staying fed."
+            }
+
+            findViewById<TextView>(R.id.EatProgress).text = progressText
+
         } else {
-            findViewById<TextView>(R.id.tvDrinkPrediction).text = "Not enough data yet!"
+            findViewById<TextView>(R.id.tvDrinkPrediction).text = "No data yet!"
         }
     }
 
