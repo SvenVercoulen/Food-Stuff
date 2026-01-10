@@ -19,15 +19,15 @@ class ForecastActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forecast)
 
-        // 1. Calculate features from UserData.csv
+        // Calculate features from UserData.csv
         val features = calculateFeatures()
 
         if (features != null) {
-            // 2. Run Predictions
+            // Run Predictions
             val drinksTomorrow = runPrediction("drink_model.onnx", features)
             val mealsTomorrow = runPrediction("eat_model.onnx", features)
 
-            // 3. Show Results
+            // Show Results
             findViewById<TextView>(R.id.tvDrinkPrediction).text =
                 "💧 Drink Goal: ${String.format("%.1f", drinksTomorrow)} times"
 
@@ -46,13 +46,12 @@ class ForecastActivity : AppCompatActivity() {
         val entries = readCsvData()
         if (entries.isEmpty()) return null
 
-        // 1. Get Today's Counts
+        // get Today's Counts
         val todayStr = today.toString()
         val drinksToday = entries.filter { it.date == todayStr && it.activity == "drink" }.size.toFloat()
         val mealsToday = entries.filter { it.date == todayStr && it.activity == "eat" }.size.toFloat()
 
-        // 2. Calculate 7-Day Averages (The "Memory")
-        // We look back 7 days BEFORE today
+        // calc 7-Day Averages (The "Memory"), look back 7 days BEFORE today
         var drinkSum = 0
         var eatSum = 0
         var daysWithData = 0
@@ -63,7 +62,6 @@ class ForecastActivity : AppCompatActivity() {
             val dayMeals = entries.filter { it.date == checkDate && it.activity == "eat" }.size
 
             // Only count if there was activity (mimicking 'min_periods=1' somewhat)
-            // Or strictly follow 7 days. Let's strictly sum the last 7 days.
             drinkSum += dayDrinks
             eatSum += dayMeals
             daysWithData++
@@ -72,13 +70,11 @@ class ForecastActivity : AppCompatActivity() {
         val avgDrink = if (daysWithData > 0) drinkSum.toFloat() / 7f else drinksToday
         val avgEat = if (daysWithData > 0) eatSum.toFloat() / 7f else mealsToday
 
-        // 3. Time Features
-        // Note: Python's day_of_week is Mon=0, Sun=6. Java's DayOfWeek is Mon=1, Sun=7.
-        // We must convert to match Python!
+        // time features (Python's day_of_week is Mon=0, Sun=6. Java's DayOfWeek is Mon=1, Sun=7,must convert to match Python)
         val dayOfWeek = (today.dayOfWeek.value - 1).toFloat()
         val isWeekend = if (dayOfWeek >= 5) 1f else 0f
 
-        // 4. Pack into array (MUST match the order used in Python training!)
+        // pack into array (MUST match the order used in Python training)
         // ['day_of_week', 'is_weekend', 'drink', 'eat', 'drink_7day_avg', 'eat_7day_avg']
         return floatArrayOf(dayOfWeek, isWeekend, drinksToday, mealsToday, avgDrink, avgEat)
     }
