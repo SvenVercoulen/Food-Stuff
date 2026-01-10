@@ -67,3 +67,11 @@ The last week I have worked on making the "eat", "drink" and "go outside" button
 Now I am working on training the model I have chosen and understanding the basics of working with making my own AI. I decided to use a more basic scikit-learn model to begin with, and change the model later if necessary. After running the model for the fist time the results were very precise and good, a little too good for a first run. I think I did something wrong while setting up the AI or testing it so I will have to check what the problem is. After being able to test the AI I am going to work on implementing the AI into the android application.
 <img width="540" height="275" alt="image" src="https://github.com/user-attachments/assets/c3cb7937-07f2-4fab-b1ef-5d1d6cb99f72" />
 
+
+After a couple days of work I redefined my AI goals and added niet parts to my implementation. Instead of predicting WHEN a user is going to eat/drink/go outside the next day I am going to predict HOW OFTEN a user will eat/drink the following day. After making new python nodes and writing new code I managed to train two new models. These models use the same dataset, but different features so I had to make a new converter file too. After generating a larger dataset and feeding it to the AI I made two nodes to test the performance of my AIs. The output of these tests can be seen in the images below.
+
+<img width="446" height="403" alt="image" src="https://github.com/user-attachments/assets/3fb49d29-5d9a-43ef-9387-2c682645a3b7" />
+<img width="444" height="401" alt="image" src="https://github.com/user-attachments/assets/486965db-c9fb-4d41-ac29-4ad7cfc16d6e" />
+
+
+
