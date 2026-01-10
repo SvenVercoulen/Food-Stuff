@@ -1,0 +1,64 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnStats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Statistics" />
+
+        <Space
+            android:layout_width="16dp"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/btnEditData"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edit data" />
+
+        <Button
+            android:id="@+id/btnForecast"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Prediction" />
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="32dp" />
+
+    <Button
+        android:id="@+id/btnEat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="EAT"
+        android:layout_gravity="center" />
+
+    <Button
+        android:id="@+id/btnDrink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DRINK"
+        android:layout_gravity="center"
+        android:layout_marginTop="12dp" />
+
+    <Button
+        android:id="@+id/btnGoOutside"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GO OUTSIDE"
+        android:layout_gravity="center"
+        android:layout_marginTop="12dp" />
+
+</LinearLayout>
