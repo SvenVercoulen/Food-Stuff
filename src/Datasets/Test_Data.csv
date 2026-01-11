@@ -1,6 +1,0 @@
-hour,day_of_week,is_weekend,minutes_since_midnight,time_since_last_drink,time_since_last_eat,time_since_last_outside
-8,0,0,480,0,480,720
-10,0,0,600,120,120,840
-14,5,1,840,240,120,60
-23,2,0,1380,5,300,600
-3,3,0,180,300,600,900
