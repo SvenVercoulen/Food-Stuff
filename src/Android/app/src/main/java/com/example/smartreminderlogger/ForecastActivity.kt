@@ -25,10 +25,10 @@ class ForecastActivity : AppCompatActivity() {
             val mealsTomorrow = runPrediction("eat_model.onnx", features)
 
             findViewById<TextView>(R.id.tvDrinkPrediction).text =
-                "💧 Drink Goal: ${String.format("%.1f", drinksTomorrow)} times"
+                "💧 Drinking prediction: ${String.format("%.1f", drinksTomorrow)} times"
 
             findViewById<TextView>(R.id.tvEatPrediction).text =
-                "🍽️ Eat Goal: ${String.format("%.1f", mealsTomorrow)} times"
+                "🍽️ Eating prediction: ${String.format("%.1f", mealsTomorrow)} times"
 
             val drinksToday = features[2]
             val drinkGoal = 15
