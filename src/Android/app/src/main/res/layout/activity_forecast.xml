@@ -4,60 +4,89 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="24dp"
-    android:gravity="center"
-    android:background="@drawable/wood">
+    android:background="@drawable/wood"> <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Forecast"
+    android:textSize="28sp"
+    android:textStyle="bold"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/etSearchForecast"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Select a resident..."
+        android:drawableStart="@android:drawable/ic_menu_search"
+        android:drawablePadding="8dp"
+        android:background="@android:drawable/edit_text"
+        android:padding="12dp"
+        android:layout_marginBottom="8dp"/>
+
+    <ListView
+        android:id="@+id/lvForecastUsers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#F0F0F0"
+        android:elevation="4dp"
+        android:layout_marginBottom="16dp"/>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/llPredictionResult"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp"
-        android:gravity="center"
-        android:background="@drawable/rounded_container">
+        android:visibility="gone"
+        android:gravity="center">
 
-    <TextView
-        android:text="Tomorrow's Plan"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:gravity="center"
+            android:background="@drawable/rounded_container"> <TextView
+            android:id="@+id/tvSelectedUserTitle"
+            android:text="Tomorrow's Plan"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"/>
 
-    <TextView
-        android:id="@+id/tvDrinkPrediction"
-        android:text="Calculating drinks..."
-        android:textSize="20sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"/>
+            <TextView
+                android:id="@+id/tvDrinkPrediction"
+                android:text="Calculating drinks..."
+                android:textSize="20sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"/>
 
-    <TextView
-        android:id="@+id/tvEatPrediction"
-        android:text="Calculating meals..."
-        android:textSize="20sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/tvEatPrediction"
+                android:text="Calculating meals..."
+                android:textSize="20sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
-    <TextView
-        android:id="@+id/DrinkProgress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:gravity="center"
-        android:text=""
-        android:textColor="#666666"
-        android:textSize="16sp" />
+            <TextView
+                android:id="@+id/DrinkProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:gravity="center"
+                android:text=""
+                android:textColor="#666666"
+                android:textSize="16sp" />
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/EatProgress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:gravity="center"
-        android:text=""
-        android:textColor="#666666"
-        android:textSize="16sp" />
+        <Button
+            android:id="@+id/btnBackToList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Another User"
+            android:layout_marginTop="24dp"/>
 
     </LinearLayout>
-
 </LinearLayout>

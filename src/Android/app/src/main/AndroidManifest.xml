@@ -25,6 +25,7 @@
         </activity>
         <activity android:name=".StatisticsActivity" />
         <activity android:name=".ForecastActivity" />
+        <activity android:name=".CreateUserActivity" />
 
     </application>
 

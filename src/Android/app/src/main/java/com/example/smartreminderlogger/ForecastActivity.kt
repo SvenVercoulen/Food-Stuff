@@ -1,156 +1,266 @@
 package com.example.smartreminderlogger
 
+import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import android.widget.TextView
 import ai.onnxruntime.OnnxTensor
 import ai.onnxruntime.OrtEnvironment
-import java.io.BufferedReader
 import java.io.File
-import java.io.InputStreamReader
 import java.nio.FloatBuffer
-import java.time.LocalDate
-import java.util.Collections
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
+
+// data class for the list
+data class ForecastUser(val id: Int, val name: String) {
+    override fun toString(): String = name
+}
 
 class ForecastActivity : AppCompatActivity() {
+
+    private lateinit var etSearch: EditText
+    private lateinit var lvUsers: ListView
+    private lateinit var llResult: LinearLayout
+    private lateinit var tvTitle: TextView
+    private lateinit var tvDrinkPred: TextView
+    private lateinit var tvEatPred: TextView
+    private lateinit var tvProgress: TextView
+    private lateinit var btnBack: Button
+
+    private val allUsers = mutableListOf<ForecastUser>()
+    private val filteredUsers = mutableListOf<ForecastUser>()
+    private lateinit var adapter: ArrayAdapter<ForecastUser>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forecast)
-        val features = calculateFeatures()
+
+        initViews()
+        loadProfiles()
+
+        // Search Filter Logic
+        etSearch.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                filterList(s.toString())
+            }
+        })
+
+        // User Selection Logic
+        lvUsers.setOnItemClickListener { _, _, position, _ ->
+            val user = filteredUsers[position]
+            showPredictionForUser(user)
+        }
+
+        // Back Button Logic
+        btnBack.setOnClickListener {
+            llResult.visibility = View.GONE
+            lvUsers.visibility = View.VISIBLE
+            etSearch.visibility = View.VISIBLE
+            etSearch.setText("")
+        }
+    }
+
+    private fun initViews() {
+        etSearch = findViewById(R.id.etSearchForecast)
+        lvUsers = findViewById(R.id.lvForecastUsers)
+        llResult = findViewById(R.id.llPredictionResult)
+
+        tvTitle = findViewById(R.id.tvSelectedUserTitle)
+        tvDrinkPred = findViewById(R.id.tvDrinkPrediction)
+        tvEatPred = findViewById(R.id.tvEatPrediction)
+        tvProgress = findViewById(R.id.DrinkProgress)
+        btnBack = findViewById(R.id.btnBackToList)
+
+        adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, filteredUsers)
+        lvUsers.adapter = adapter
+    }
+
+    private fun loadProfiles() {
+        allUsers.clear()
+        val file = File(filesDir, "Profiles.csv")
+        if (file.exists()) {
+            val lines = file.readLines().drop(1)
+            for (line in lines) {
+                val parts = line.split(",")
+                if (parts.size >= 2) {
+                    allUsers.add(ForecastUser(parts[0].toInt(), parts[1]))
+                }
+            }
+            filterList("") // Load initial list
+        }
+    }
+
+    private fun filterList(query: String) {
+        filteredUsers.clear()
+        if (query.isEmpty()) {
+            filteredUsers.addAll(allUsers)
+        } else {
+            val lower = query.lowercase()
+            allUsers.forEach { if (it.name.lowercase().contains(lower)) filteredUsers.add(it) }
+        }
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun showPredictionForUser(user: ForecastUser) {
+        // Hide list, show result container
+        hideKeyboard()
+        lvUsers.visibility = View.GONE
+        etSearch.visibility = View.GONE
+        llResult.visibility = View.VISIBLE
+        tvTitle.text = "Plan for ${user.name}"
+
+        // 1. Calculate Features for THIS user
+        val features = calculateFeatures(user.id)
 
         if (features != null) {
+            // 2. Run Predictions
             val drinksTomorrow = runPrediction("drink_model.onnx", features)
             val mealsTomorrow = runPrediction("eat_model.onnx", features)
 
-            findViewById<TextView>(R.id.tvDrinkPrediction).text =
-                "💧 Drinking prediction: ${String.format("%.1f", drinksTomorrow)} times"
+            // 3. Update UI
+            tvDrinkPred.text = "💧 Drinking prediction: ${String.format("%.1f", drinksTomorrow)} times"
+            tvEatPred.text = "🍽️ Eating prediction: ${String.format("%.1f", mealsTomorrow)} times"
 
-            findViewById<TextView>(R.id.tvEatPrediction).text =
-                "🍽️ Eating prediction: ${String.format("%.1f", mealsTomorrow)} times"
-
+            // Optional: Progress text
             val drinksToday = features[2]
-            val drinkGoal = 15
-            val drinkRemaining = drinkGoal - drinksToday
-
-            val drinkProgressText = if (drinkGoal > drinksToday) {
-                "You've drank ${drinksToday.toInt()} times today.\nDrink ${String.format("%.1f", drinkRemaining)} more times to reach your goal!"
-            } else {
-                "You've drank ${drinksToday.toInt()} times today.\nGoal reached! Great job staying hydrated."
-            }
-
-            findViewById<TextView>(R.id.DrinkProgress).text = drinkProgressText
-
-            val eatToday = features[3]
-            val eatGoal = 4
-            val eatRemaining = eatGoal - eatToday
-
-            val progressText = if (eatGoal > eatToday) {
-                "You've ate ${eatToday.toInt()} times today.\nEat ${String.format("%.1f", eatRemaining)} more times to reach your goal!"
-            } else {
-                "You've ate ${eatToday.toInt()} times today.\nGoal reached! Great job staying fed."
-            }
-
-            findViewById<TextView>(R.id.EatProgress).text = progressText
-
+            tvProgress.text = "Current status today:\nDrinks: ${drinksToday.toInt()} | Meals: ${features[3].toInt()}"
         } else {
-            findViewById<TextView>(R.id.tvDrinkPrediction).text = "No data yet!"
+            tvDrinkPred.text = "Not enough data"
+            tvEatPred.text = "to make a prediction."
+            tvProgress.text = ""
         }
     }
 
-    // --- LOGIC TO MIMIC YOUR PYTHON FEATURE EXTRACTION ---
-    private fun calculateFeatures(): FloatArray? {
-        val today = LocalDate.now()
 
-        // Read CSV and parse dates
-        val entries = readCsvData()
-        if (entries.isEmpty()) return null
+    private fun calculateFeatures(userId: Int): FloatArray? {
+        val file = File(filesDir, "User_$userId.csv")
+        if (!file.exists()) return null
 
-        // get Today's Counts
-        val todayStr = today.toString()
-        val drinksToday = entries.filter { it.date == todayStr && it.activity == "drink" }.size.toFloat()
-        val mealsToday = entries.filter { it.date == todayStr && it.activity == "eat" }.size.toFloat()
+        val entries = mutableListOf<CsvEntry>()
+        val lines = file.readLines().drop(1)
 
-        // calc 7-Day Averages (The "Memory"), look back 7 days BEFORE today
-        var drinkSum = 0
-        var eatSum = 0
-        var daysWithData = 0
-
-        for (i in 1..7) {
-            val checkDate = today.minusDays(i.toLong()).toString()
-            val dayDrinks = entries.filter { it.date == checkDate && it.activity == "drink" }.size
-            val dayMeals = entries.filter { it.date == checkDate && it.activity == "eat" }.size
-
-            // Only count if there was activity (mimicking 'min_periods=1' somewhat)
-            drinkSum += dayDrinks
-            eatSum += dayMeals
-            daysWithData++
+        for (line in lines) {
+            val parts = line.split(",")
+            if (parts.size >= 3) {
+                val act = parts[1]
+                val ts = parts[2]
+                val date = ts.split(" ")[0]
+                entries.add(CsvEntry(act, date))
+            }
         }
 
-        val avgDrink = if (daysWithData > 0) drinkSum.toFloat() / 7f else drinksToday
-        val avgEat = if (daysWithData > 0) eatSum.toFloat() / 7f else mealsToday
+        val calendar = Calendar.getInstance()
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
 
-        // time features (Python's day_of_week is Mon=0, Sun=6. Java's DayOfWeek is Mon=1, Sun=7,must convert to match Python)
-        val dayOfWeek = (today.dayOfWeek.value - 1).toFloat()
+        // Better Day of Week logic (Monday=0, Sunday=6)
+        val dayOfWeek = (calendar.get(Calendar.DAY_OF_WEEK) + 5) % 7
         val isWeekend = if (dayOfWeek >= 5) 1f else 0f
 
-        // pack into array (MUST match the order used in Python training)
-        // ['day_of_week', 'is_weekend', 'drink', 'eat', 'drink_7day_avg', 'eat_7day_avg']
-        return floatArrayOf(dayOfWeek, isWeekend, drinksToday, mealsToday, avgDrink, avgEat)
+        var drinkToday = 0f
+        var eatToday = 0f
+        var drinkWeekCount = 0
+        var eatWeekCount = 0
+
+        // Set oneWeekAgo to exactly 7 days ago at MIDNIGHT to be safe
+        val calWeek = Calendar.getInstance()
+        calWeek.add(Calendar.DAY_OF_YEAR, -7)
+        calWeek.set(Calendar.HOUR_OF_DAY, 0)
+        val oneWeekAgoDate = calWeek.time
+
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+        entries.forEach { entry ->
+            if (entry.date == today) {
+                if (entry.activity == "drink") drinkToday++
+                if (entry.activity == "eat") eatToday++
+            }
+
+            try {
+                val entryDate = sdf.parse(entry.date)
+                if (entryDate != null && !entryDate.before(oneWeekAgoDate)) {
+                    if (entry.activity == "drink") drinkWeekCount++
+                    if (entry.activity == "eat") eatWeekCount++
+                }
+            } catch (e: Exception) { }
+        }
+
+        val drinkAvg = drinkWeekCount / 7f
+        val eatAvg = eatWeekCount / 7f
+
+        val features = floatArrayOf(
+            dayOfWeek.toFloat(),
+            isWeekend,
+            drinkToday,
+            eatToday,
+            drinkAvg,
+            eatAvg
+        )
+
+        // DEBUG
+        Log.d("AI_INPUT", "User $userId Features: ${features.joinToString(", ")}")
+
+        return features
     }
 
-    private fun runPrediction(modelName: String, inputs: FloatArray): Float {
+    // Update the runPrediction function
+    private fun runPrediction(modelName: String, inputData: FloatArray): Float {
         try {
             val env = OrtEnvironment.getEnvironment()
-            // Read model from assets
-            val modelBytes = assets.open(modelName).readBytes()
-            val session = env.createSession(modelBytes)
 
-            // Create input tensor (Shape: [1, 6])
-            val floatBuffer = FloatBuffer.wrap(inputs)
-            val tensor = OnnxTensor.createTensor(env, floatBuffer, longArrayOf(1, 6))
+            // Ensure the model exists in internal storage
+            val modelPath = File(filesDir, modelName).absolutePath
+            if (!File(modelPath).exists()) {
+                copyAssetToInternalStorage(modelName)
+            }
 
-            // Run inference
-            val result = session.run(Collections.singletonMap("float_input", tensor))
+            val session = env.createSession(modelPath)
 
-            // Extract result (The model returns a 2D array [[prediction]])
+            // Create Tensor
+            val shape = longArrayOf(1, 6)
+            val tensor = OnnxTensor.createTensor(env, FloatBuffer.wrap(inputData), shape)
+
+            // Run prediction using the model's actual input name
+            val inputName = session.inputNames.iterator().next()
+            val result = session.run(Collections.singletonMap(inputName, tensor))
+
+            // SAFE WAY TO GET THE RESULT:
             val outputTensor = result[0] as OnnxTensor
-            val outputArray = outputTensor.floatBuffer.array()
+            val outputValue = outputTensor.floatBuffer.get(0) // Don't use .array()
 
-            return outputArray[0] // Return the single prediction
+            result.close()
+            session.close()
 
+            return outputValue
         } catch (e: Exception) {
-            Log.e("AI_ERROR", "Error running model $modelName", e)
+            Log.e("AI_PREDICT", "Error running $modelName: ${e.message}")
             return 0f
         }
     }
 
-    // Helper data class for parsing
-    data class CsvEntry(val activity: String, val date: String)
-
-    private fun readCsvData(): List<CsvEntry> {
-        val list = mutableListOf<CsvEntry>()
-        try {
-            val file = File(filesDir, "UserData.csv")
-
-            if (!file.exists()) return emptyList()
-
-            val reader = file.bufferedReader()
-            reader.forEachLine { line ->
-                if (!line.startsWith("user_id")) {
-                    val parts = line.split(",")
-                    if (parts.size >= 3) {
-                        val activity = parts[1]
-                        val timestamp = parts[2]
-                        val date = timestamp.split(" ")[0]
-                        list.add(CsvEntry(activity, date))
-                    }
-                }
+    // function to move models from assets to internal storage
+    private fun copyAssetToInternalStorage(fileName: String) {
+        assets.open(fileName).use { inputStream ->
+            File(filesDir, fileName).outputStream().use { outputStream ->
+                inputStream.copyTo(outputStream)
             }
-        } catch (e: Exception) {
-            Log.e("CSV", "Error reading data", e)
         }
-        return list
     }
+
+    private fun hideKeyboard() {
+        val view = this.currentFocus
+        if (view != null) {
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
+
+    data class CsvEntry(val activity: String, val date: String)
 }

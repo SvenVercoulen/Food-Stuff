@@ -1,91 +1,136 @@
 package com.example.smartreminderlogger
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.ListView
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import java.io.File
-import java.io.FileWriter
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
+data class ElderlyUser(val id: Int, val name: String) {
+    override fun toString(): String = name
+}
 
 class MainActivity : AppCompatActivity() {
 
-    private var isOutside = false
-    private var outsideStartTime: Long = 0
-    private val userId = 1
+    private lateinit var listView: ListView
+    private var userList = mutableListOf<ElderlyUser>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val btnForecast = findViewById<Button>(R.id.btnForecast)
-        btnForecast.setOnClickListener {
-            val intent = Intent(this, ForecastActivity::class.java)
-            startActivity(intent)
+        listView = findViewById(R.id.userListView)
+
+        findViewById<Button>(R.id.btnAddUser).setOnClickListener {
+            startActivity(Intent(this, CreateUserActivity::class.java))
         }
 
-        val btnStats = findViewById<Button>(R.id.btnStats)
-        btnStats.setOnClickListener {
+        findViewById<Button>(R.id.btnStats).setOnClickListener {
             startActivity(Intent(this, StatisticsActivity::class.java))
         }
 
-        val btnEat = findViewById<Button>(R.id.btnEat)
-        val btnDrink = findViewById<Button>(R.id.btnDrink)
-        val btnOutside = findViewById<Button>(R.id.btnGoOutside)
-
-        btnEat.setOnClickListener {
-            logEvent("eat")
-            Toast.makeText(this, "Logged: Eat", Toast.LENGTH_SHORT).show()
+        findViewById<Button>(R.id.btnPredict).setOnClickListener {
+            startActivity(Intent(this, ForecastActivity::class.java))
         }
 
-        btnDrink.setOnClickListener {
-            logEvent("drink")
-            Toast.makeText(this, "Logged: Drink", Toast.LENGTH_SHORT).show()
+        listView.setOnItemClickListener { _, _, position, _ ->
+            showActionDialog(userList[position])
         }
 
+        loadUsersFromCsv()
+    }
 
-        btnOutside.setOnClickListener {
-            if (!isOutside) {
-                isOutside = true
-                outsideStartTime = System.currentTimeMillis()
-                btnOutside.text = "Back Inside"
-                logEvent("outside_in")
-                Toast.makeText(this, "Logged: Outside Start", Toast.LENGTH_SHORT).show()
-            } else {
-                isOutside = false
-                btnOutside.text = "Go Outside"
-                logEvent("outside_out")
+    override fun onResume() {
+        super.onResume()
+        loadUsersFromCsv() // Refresh list when returning to this page
+    }
 
-                val duration = System.currentTimeMillis() - outsideStartTime
-                val minutes = duration / 1000 / 60
-                Toast.makeText(this, "Outside for $minutes minutes", Toast.LENGTH_SHORT).show()
+    private fun loadUsersFromCsv() {
+        userList.clear()
+        val file = File(filesDir, "Profiles.csv")
+
+        if (file.exists()) {
+            val lines = file.readLines().drop(1) // Skip header
+            for (line in lines) {
+                val parts = line.split(",")
+                if (parts.size >= 2) {
+                    userList.add(ElderlyUser(parts[0].toInt(), parts[1]))
+                }
             }
         }
+
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, userList)
+        listView.adapter = adapter
     }
 
+    private fun showActionDialog(user: ElderlyUser) {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_actions, null)
 
-    private fun logEvent(activity: String) {
-        val timestamp = getCurrentTimestamp()
-        val line = "$userId,$activity,$timestamp\n"
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
 
-        val file = File(filesDir, "UserData.csv")
-        val writeHeader = !file.exists()
+        dialogView.findViewById<TextView>(R.id.tvDialogTitle).text = "Log for ${user.name}"
 
-        val writer = FileWriter(file, true)
-        if (writeHeader) {
-            writer.append("user_id,activity,timestamp\n")
+        dialogView.findViewById<Button>(R.id.btnDialogEat).setOnClickListener {
+            saveAction(user.id, "eat")
+            dialog.dismiss()
         }
 
-        writer.append(line)
-        writer.flush()
-        writer.close()
+        dialogView.findViewById<Button>(R.id.btnDialogDrink).setOnClickListener {
+            saveAction(user.id, "drink")
+            dialog.dismiss()
+        }
+
+        dialogView.findViewById<Button>(R.id.btnDialogOutside).setOnClickListener {
+            saveAction(user.id, "outside_out") // Simplified for demo
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
-    private fun getCurrentTimestamp(): String {
-        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-        return sdf.format(Date())
+    // SAVING LOGIC
+    private fun saveAction(targetUserId: Int, action: String) {
+        // Creates "User_1.csv", "User_2.csv", etc.
+        val fileName = "User_${targetUserId}.csv"
+
+        // Save to Internal Storage (Private to app)
+        val file = File(filesDir, fileName)
+
+        val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
+
+        // Create Header if this is the FIRST time this specific user is being logged
+        if (!file.exists()) {
+            try {
+                FileOutputStream(file, true).use { output ->
+                    output.write("user_id,activity,timestamp\n".toByteArray())
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        // Save the data
+        val data = "$targetUserId,$action,$timestamp\n"
+
+        try {
+            FileOutputStream(file, true).use { output ->
+                output.write(data.toByteArray())
+            }
+            Toast.makeText(this, "Saved to $fileName", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Error saving data", Toast.LENGTH_SHORT).show()
+        }
     }
 }
