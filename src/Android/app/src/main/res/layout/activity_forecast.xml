@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="24dp"
-    android:background="@drawable/wood"> <TextView
+    android:background="@drawable/main_background"> <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:text="Forecast"
@@ -12,6 +12,7 @@
     android:textStyle="bold"
     android:layout_gravity="center_horizontal"
     android:layout_marginBottom="16dp"/>
+
 
     <EditText
         android:id="@+id/etSearchForecast"
