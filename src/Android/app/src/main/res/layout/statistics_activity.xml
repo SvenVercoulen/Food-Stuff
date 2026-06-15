@@ -10,8 +10,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="User Statistics"
-        android:textSize="24sp"
+        android:textSize="28sp"
         android:textStyle="bold"
+        android:textColor="#0D47A1"
         android:layout_marginBottom="16dp"
         android:layout_gravity="center_horizontal"/>
 
@@ -24,92 +25,18 @@
         android:drawablePadding="8dp"
         android:background="@android:drawable/edit_text"
         android:padding="12dp"
-        android:layout_marginBottom="8dp"/>
-
-    <ListView
-        android:id="@+id/lvSearchResults"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:background="#F0F0F0"
-        android:elevation="4dp"
         android:layout_marginBottom="16dp"/>
 
     <ScrollView
-        android:id="@+id/svStatsContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone">
+        android:fillViewport="true">
 
         <LinearLayout
+            android:id="@+id/llStatsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvSelectedUserName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Statistics for John Doe"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#333"
-                android:gravity="center"
-                android:layout_marginBottom="24dp"/>
-
-            <TextView
-                android:id="@+id/tvEatCount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Meals today: 0"
-                android:textSize="18sp"
-                android:layout_marginBottom="12dp"/>
-
-            <TextView
-                android:id="@+id/tvDrinkCount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Drinks today: 0"
-                android:textSize="18sp"
-                android:layout_marginBottom="12dp"/>
-
-            <TextView
-                android:id="@+id/tvOutsideMinutes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Time outside today: 0 mins"
-                android:textSize="18sp"
-                android:layout_marginBottom="12dp"/>
-
-            <TextView
-                android:id="@+id/tvOutsideWeek"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Outside this week: 0 times"
-                android:textSize="18sp"
-                android:layout_marginBottom="24dp"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#CCC"
-                android:layout_marginBottom="24dp"/>
-
-            <TextView
-                android:id="@+id/tvLastEat"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Last meal: Never"
-                android:textSize="16sp"
-                android:layout_marginBottom="8dp"/>
-
-            <TextView
-                android:id="@+id/tvLastDrink"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Last drink: Never"
-                android:textSize="16sp"/>
-
-        </LinearLayout>
+            android:orientation="vertical"
+            android:paddingBottom="24dp"/>
     </ScrollView>
 </LinearLayout>
