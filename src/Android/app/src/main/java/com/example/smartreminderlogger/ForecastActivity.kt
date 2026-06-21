@@ -117,19 +117,19 @@ class ForecastActivity : AppCompatActivity() {
         llResult.visibility = View.VISIBLE
         tvTitle.text = "Plan for ${user.name}"
 
-        // 1. Calculate Features for THIS user
+        // Calculate Features for THIS user
         val features = calculateFeatures(user.id)
 
         if (features != null) {
-            // 2. Run Predictions
+            // Run Predictions
             val drinksTomorrow = runPrediction("drink_model.onnx", features)
             val mealsTomorrow = runPrediction("eat_model.onnx", features)
 
-            // 3. Update UI
+            // Update UI
             tvDrinkPred.text = "💧 Drinking prediction: ${String.format("%.1f", drinksTomorrow)} times"
             tvEatPred.text = "🍽️ Eating prediction: ${String.format("%.1f", mealsTomorrow)} times"
 
-            // Optional: Progress text
+            // Progress text
             val drinksToday = features[2]
             tvProgress.text = "Current status today:\nDrinks: ${drinksToday.toInt()} | Meals: ${features[3].toInt()}"
         } else {
